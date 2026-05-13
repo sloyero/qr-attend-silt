@@ -3,13 +3,45 @@
     let email = ''
     let password = ''
 
+    async function login() {
+
+        await fetch('/login', {
+
+            method: 'POST',
+
+            headers: {
+
+                'Content-Type': 'application/json',
+
+                'X-CSRF-TOKEN': document
+                    .querySelector('meta[name="csrf-token"]')
+                    .content,
+
+            },
+
+            body: JSON.stringify({
+
+                email,
+                password,
+
+            }),
+
+        })
+
+        window.location.href = '/dashboard'
+
+    }
+
 </script>
 
 <div class="min-h-screen bg-slate-900 flex items-center justify-center">
 
-    <form class="bg-white p-8 rounded-xl w-96 shadow-lg">
+    <form
+        on:submit|preventDefault={login}
+        class="bg-white p-8 rounded-xl w-96"
+    >
 
-        <h1 class="text-3xl font-bold mb-5 text-center">
+        <h1 class="text-3xl font-bold mb-5">
             Login
         </h1>
 
@@ -28,7 +60,7 @@
         />
 
         <button
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg"
+            class="w-full bg-blue-600 text-white p-3 rounded-lg"
         >
             Login
         </button>
