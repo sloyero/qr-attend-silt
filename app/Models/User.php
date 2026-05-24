@@ -20,7 +20,7 @@ class User extends Authenticatable
 
         'nim',
         'nidn',
--n        'name',
+        'name',
         'email',
         'password',
         'role',
@@ -56,5 +56,10 @@ class User extends Authenticatable
             'password' => 'hashed',
 
         ];
+    }
+
+    public function kehadirans()
+    {
+        return $this->hasMany(Kehadiran::class);
     }
 }

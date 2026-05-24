@@ -1,0 +1,37 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('kehadirans', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+
+            $table->foreignId('mata_kuliah_id')
+                  ->constrained('mata_kuliahs')
+                  ->onDelete('cascade');
+
+            $table->timestamp('waktu_scan');
+
+            $table->enum('status', [
+                'hadir',
+                'telat',
+                'izin',
+                'alpha'
+            ])->default('hadir');
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('kehadirans');
+    }
+};

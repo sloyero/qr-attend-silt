@@ -72,7 +72,7 @@
             </a>
 
             <a
-                href="/dashboard"
+                href="/riwayat-absensi"
                 class="flex items-center gap-3 text-slate-600 hover:bg-slate-100 px-5 py-4 rounded-xl"
             >
                 📄 Rekap Kehadiran

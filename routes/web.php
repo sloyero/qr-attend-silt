@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\KehadiranController;
 
 Route::get('/', function () {
 
@@ -145,3 +146,17 @@ Route::get('/admin/dosen', [AdminController::class, 'dosen']);
 Route::post('/admin/dosen', [AdminController::class, 'storeDosen']);
 
 Route::post('/admin/mahasiswa', [AdminController::class, 'storeMahasiswa']);
+
+/*
+|--------------------------------------------------------------------------
+| KEHADIRAN
+|--------------------------------------------------------------------------
+*/
+
+// Rekap kehadiran untuk dosen/admin
+Route::get('/rekap', [KehadiranController::class, 'index'])
+    ->middleware('auth');
+
+// Riwayat absensi mahasiswa
+Route::get('/riwayat-absensi', [KehadiranController::class, 'riwayat'])
+    ->middleware('auth');
