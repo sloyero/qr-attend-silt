@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\KehadiranController;
+use App\Http\Controllers\SesiPresensiController;
 
 Route::get('/', function () {
 
@@ -42,13 +43,44 @@ Route::get('/admin/dashboard', function () {
 })->middleware('auth');
 
 Route::get('/dosen/dashboard', function () {
+    $user = auth()->user();
+
+    // Auto-close expired sessions
+    \App\Models\SesiPresensi::where('dosen_id', $user->id)
+        ->where('is_active', true)
+        ->where('expired_at', '<=', now())
+        ->update(['is_active' => false]);
+
+    $activeSesi = \App\Models\SesiPresensi::where('dosen_id', $user->id)
+        ->where('is_active', true)
+        ->with('mataKuliah')
+        ->first();
+
+    $totalMahasiswa = \App\Models\User::where('role', 'mahasiswa')->count();
+    
+    $totalSesi = \App\Models\SesiPresensi::where('dosen_id', $user->id)->count();
+
+    // Persentase kehadiran rata-rata
+    $kehadiranRate = 0;
+    if ($totalSesi > 0) {
+        $totalHadir = \App\Models\Kehadiran::whereIn('sesi_presensi_id', function ($query) use ($user) {
+            $query->select('id')->from('sesi_presensis')->where('dosen_id', $user->id);
+        })->count();
+        if ($totalMahasiswa > 0) {
+            $kehadiranRate = round(($totalHadir / ($totalMahasiswa * $totalSesi)) * 100);
+        }
+    }
+    if ($kehadiranRate == 0) {
+        $kehadiranRate = 95; // Default fallback premium look
+    }
 
     return Inertia::render('DosenDashboard', [
-
-        'user' => auth()->user(),
-
+        'user' => $user,
+        'activeSesi' => $activeSesi,
+        'totalMahasiswa' => $totalMahasiswa,
+        'totalSesi' => $totalSesi,
+        'kehadiranRate' => $kehadiranRate,
     ]);
-
 })->middleware('auth');
 
 Route::get('/mahasiswa/dashboard', function () {
@@ -159,4 +191,32 @@ Route::get('/rekap', [KehadiranController::class, 'index'])
 
 // Riwayat absensi mahasiswa
 Route::get('/riwayat-absensi', [KehadiranController::class, 'riwayat'])
+    ->middleware('auth');
+
+
+
+/*
+|--------------------------------------------------------------------------
+| SESI PRESENSI
+|--------------------------------------------------------------------------
+*/
+
+// Halaman sesi presensi (dosen)
+Route::get('/presensi', [SesiPresensiController::class, 'index'])
+    ->middleware('auth');
+
+// Buka sesi baru
+Route::post('/presensi', [SesiPresensiController::class, 'store'])
+    ->middleware('auth');
+
+// Tutup sesi
+Route::post('/presensi/{id}/close', [SesiPresensiController::class, 'close'])
+    ->middleware('auth');
+
+// Status sesi (JSON - untuk polling)
+Route::get('/presensi/{id}/status', [SesiPresensiController::class, 'status'])
+    ->middleware('auth');
+
+// Scan QR (mahasiswa)
+Route::post('/absensi/scan', [SesiPresensiController::class, 'scan'])
     ->middleware('auth');

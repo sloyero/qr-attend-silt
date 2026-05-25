@@ -9,6 +9,7 @@ class Kehadiran extends Model
     protected $fillable = [
         'user_id',
         'mata_kuliah_id',
+        'sesi_presensi_id',
         'waktu_scan',
         'status',
     ];
@@ -23,5 +24,11 @@ class Kehadiran extends Model
     public function mataKuliah()
     {
         return $this->belongsTo(MataKuliah::class);
+    }
+
+    // Relasi ke sesi presensi
+    public function sesiPresensi()
+    {
+        return $this->belongsTo(SesiPresensi::class);
     }
 }
