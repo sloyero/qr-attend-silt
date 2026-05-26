@@ -20,6 +20,7 @@ class User extends Authenticatable
 
         'nim',
         'nidn',
+        'matkul',
         'name',
         'email',
         'password',

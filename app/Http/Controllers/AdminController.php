@@ -76,4 +76,28 @@ class AdminController extends Controller
 
         return back();
     }
+
+    public function destroyDosen($id)
+    {
+        User::findOrFail($id)->delete();
+
+        return back();
+    }
+
+    public function updateMatkul(Request $request, $id)
+    {
+        $dosen = User::findOrFail($id);
+
+        $dosen->update([
+
+            'matkul' => $request->matkul,
+
+        ]);
+
+        return response()->json([
+
+            'message' => 'Matakuliah berhasil diupdate'
+
+        ]);
+    }
 }

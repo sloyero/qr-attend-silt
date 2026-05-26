@@ -220,3 +220,7 @@ Route::get('/presensi/{id}/status', [SesiPresensiController::class, 'status'])
 // Scan QR (mahasiswa)
 Route::post('/absensi/scan', [SesiPresensiController::class, 'scan'])
     ->middleware('auth');
+
+    Route::delete('/admin/dosen/{id}', [AdminController::class, 'destroyDosen']);
+    Route::put('/admin/dosen/{id}/matkul', [AdminController::class, 'updateMatkul']);
+    

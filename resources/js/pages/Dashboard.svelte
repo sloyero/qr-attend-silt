@@ -1,107 +1,65 @@
 <script>
-    import { Html5Qrcode } from 'html5-qrcode'
-    import { onDestroy } from 'svelte'
+
+    import { onMount } from 'svelte'
 
     export let user
+    export let kehadirans = []
 
-    let scanning = false
-    let scanner = null
-    let scanResult = null
-    let scanError = null
-    let scanLoading = false
+    let totalHadir = 0
+    let totalTelat = 0
+    let totalIzin = 0
+    let totalAlpha = 0
 
-    async function startScanner() {
-        scanning = true
-        scanResult = null
-        scanError = null
-
-        // Tunggu DOM render
-        await new Promise(r => setTimeout(r, 100))
-
-        scanner = new Html5Qrcode('qr-reader')
-
-        try {
-            await scanner.start(
-                { facingMode: 'environment' },
-                {
-                    fps: 10,
-                    qrbox: { width: 250, height: 250 },
-                },
-                async (decodedText) => {
-                    // Berhasil scan, kirim ke server
-                    await stopScanner()
-                    await kirimAbsensi(decodedText)
-                },
-                () => {
-                    // ignore scan errors (no QR found)
-                }
-            )
-        } catch (err) {
-            scanError = 'Tidak dapat mengakses kamera. Pastikan izin kamera diberikan.'
-            scanning = false
-        }
-    }
-
-    async function stopScanner() {
-        if (scanner) {
-            try {
-                await scanner.stop()
-            } catch (e) {
-                // ignore
-            }
-            scanner = null
-        }
-        scanning = false
-    }
-
-    async function kirimAbsensi(token) {
-        scanLoading = true
-        scanResult = null
-        scanError = null
-
-        try {
-            const res = await fetch('/absensi/scan', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                },
-                body: JSON.stringify({ token }),
-            })
-
-            const data = await res.json()
-
-            if (data.success) {
-                scanResult = {
-                    message: data.message,
-                    status: data.status,
-                }
-            } else {
-                scanError = data.message || 'Gagal mencatat kehadiran.'
-            }
-        } catch (err) {
-            scanError = 'Terjadi kesalahan jaringan.'
-        }
-
-        scanLoading = false
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | LOGOUT
+    |--------------------------------------------------------------------------
+    */
 
     async function logout() {
+
         await fetch('/logout', {
+
             method: 'POST',
+
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+
+                'X-CSRF-TOKEN': document
+                    .querySelector('meta[name="csrf-token"]')
+                    .content,
+
                 'Content-Type': 'application/json',
+
             },
+
         })
+
         window.location.href = '/login'
+
     }
 
-    onDestroy(() => {
-        if (scanner) {
-            try { scanner.stop() } catch(e) {}
+    /*
+    |--------------------------------------------------------------------------
+    | COUNT ABSENSI
+    |--------------------------------------------------------------------------
+    */
+
+    onMount(() => {
+
+        if (Array.isArray(kehadirans)) {
+
+            totalHadir = kehadirans.filter(k => k.status === 'hadir').length
+
+            totalTelat = kehadirans.filter(k => k.status === 'telat').length
+
+            totalIzin = kehadirans.filter(k => k.status === 'izin').length
+
+            totalAlpha = kehadirans.filter(k => k.status === 'alpha').length
+
         }
+
     })
+
 </script>
 
 <div class="min-h-screen bg-slate-100 flex">
@@ -110,13 +68,16 @@
     <aside class="w-72 bg-white border-r border-slate-200 p-6 flex flex-col">
 
         <div class="mb-10">
+
             <h1 class="text-3xl font-bold text-[#062B66]">
                 QR-Attend
             </h1>
+
         </div>
 
         <nav class="space-y-3 flex-1">
 
+            <!-- DASHBOARD -->
             <a
                 href="/mahasiswa/dashboard"
                 class="flex items-center gap-3 bg-slate-100 text-[#062B66] px-5 py-4 rounded-xl font-semibold"
@@ -124,21 +85,39 @@
                 📊 Dashboard
             </a>
 
+            <!-- SCAN -->
             <a
-                href="/akun"
+                href="/presensi"
                 class="flex items-center gap-3 text-slate-600 hover:bg-slate-100 px-5 py-4 rounded-xl"
             >
-                👤 Akun
+                🎯 Scan Presensi
             </a>
 
+            <!-- RIWAYAT -->
             <a
                 href="/riwayat-absensi"
                 class="flex items-center gap-3 text-slate-600 hover:bg-slate-100 px-5 py-4 rounded-xl"
             >
-                📄 Riwayat Kehadiran
+                📄 Riwayat Absensi
+            </a>
+
+            <!-- PROFILE -->
+            <a
+                href="/akun"
+                class="flex items-center gap-3 text-slate-600 hover:bg-slate-100 px-5 py-4 rounded-xl"
+            >
+                ⚙️ Profile
             </a>
 
         </nav>
+
+        <!-- LOGOUT -->
+        <button
+            on:click={logout}
+            class="w-full bg-red-50 text-red-600 hover:bg-red-100 px-5 py-3 rounded-xl font-semibold transition border border-red-200"
+        >
+            🚪 Logout
+        </button>
 
     </aside>
 
@@ -149,122 +128,214 @@
         <div class="flex justify-between items-center mb-10">
 
             <div>
-                <h1 class="text-5xl font-bold text-[#062B66] mb-2">
-                    Dashboard
+
+                <h1 class="text-6xl font-bold text-[#062B66] mb-2">
+                    Dashboard Mahasiswa
                 </h1>
+
                 <p class="text-slate-500 text-xl">
-                    Selamat datang, {user.name}! Scan QR Code untuk mencatat kehadiran.
+                    Pantau kehadiran Anda dan scan QR Code kelas.
                 </p>
+
             </div>
 
-            <div class="flex items-center gap-5">
-                <div class="text-right">
-                    <h2 class="font-bold text-slate-800 text-lg">{user.name}</h2>
-                    <p class="text-slate-500 capitalize">{user.role}</p>
-                </div>
-                <button
-                    onclick={logout}
-                    class="bg-white shadow px-5 py-3 rounded-xl border border-slate-200 hover:bg-red-50"
-                >
-                    Logout
-                </button>
-            </div>
+            <div class="text-right">
 
-        </div>
-
-        <!-- SCAN QR SECTION -->
-        <div class="bg-white rounded-3xl shadow-sm p-10 mb-8 border border-slate-200">
-
-            <div class="text-center max-w-lg mx-auto">
-
-                <div class="text-6xl mb-6">📷</div>
-
-                <h2 class="text-3xl font-bold text-[#062B66] mb-3">
-                    Scan QR Code Presensi
+                <h2 class="font-bold text-slate-800 text-lg">
+                    {user.name}
                 </h2>
 
-                <p class="text-slate-500 text-lg mb-8">
-                    Arahkan kamera ke QR Code yang ditampilkan oleh dosen untuk mencatat kehadiran Anda.
+                <p class="text-slate-500 text-sm">
+                    {user.nim}
                 </p>
 
-                <!-- RESULT -->
-                {#if scanResult}
-                    <div class="mb-6 p-6 rounded-2xl {scanResult.status === 'hadir' ? 'bg-green-50 border border-green-200' : 'bg-yellow-50 border border-yellow-200'}">
-                        <div class="text-4xl mb-3">
-                            {scanResult.status === 'hadir' ? '✅' : '⚠️'}
-                        </div>
-                        <p class="text-xl font-bold {scanResult.status === 'hadir' ? 'text-green-700' : 'text-yellow-700'}">
-                            {scanResult.message}
-                        </p>
-                        <p class="mt-2 text-lg {scanResult.status === 'hadir' ? 'text-green-600' : 'text-yellow-600'}">
-                            Status: <strong class="uppercase">{scanResult.status}</strong>
-                        </p>
-                    </div>
-                {/if}
-
-                {#if scanError}
-                    <div class="mb-6 p-6 rounded-2xl bg-red-50 border border-red-200">
-                        <div class="text-4xl mb-3">❌</div>
-                        <p class="text-lg font-semibold text-red-700">{scanError}</p>
-                    </div>
-                {/if}
-
-                {#if scanLoading}
-                    <div class="mb-6 p-6 rounded-2xl bg-blue-50 border border-blue-200">
-                        <p class="text-lg font-semibold text-blue-700">⏳ Memproses kehadiran...</p>
-                    </div>
-                {/if}
-
-                <!-- QR READER -->
-                {#if scanning}
-                    <div class="mb-6">
-                        <div id="qr-reader" class="rounded-2xl overflow-hidden mx-auto" style="max-width: 400px;"></div>
-                    </div>
-                    <button
-                        onclick={stopScanner}
-                        class="bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors"
-                    >
-                        ✕ Batal Scan
-                    </button>
-                {:else if !scanResult}
-                    <button
-                        onclick={startScanner}
-                        class="bg-[#062B66] hover:bg-[#0a3d8f] text-white px-10 py-5 rounded-2xl font-bold text-xl transition-colors shadow-lg hover:shadow-xl"
-                    >
-                        📷 Scan QR Code
-                    </button>
-                {:else}
-                    <button
-                        onclick={() => { scanResult = null; scanError = null; }}
-                        class="bg-[#062B66] hover:bg-[#0a3d8f] text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors"
-                    >
-                        📷 Scan Lagi
-                    </button>
-                {/if}
+                <p class="text-slate-500 capitalize text-sm">
+                    {user.role}
+                </p>
 
             </div>
 
         </div>
 
-        <!-- INFO CARDS -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- PROFILE CARD -->
+        <div class="bg-white rounded-3xl shadow-sm p-8 mb-10 border border-slate-200">
 
-            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-                <div class="text-4xl mb-4">👤</div>
-                <h3 class="text-lg font-bold text-[#062B66] mb-1">{user.name}</h3>
-                <p class="text-slate-500">NIM: {user.nim || '-'}</p>
-                <p class="text-slate-500 capitalize">Role: {user.role}</p>
+            <div class="flex items-center gap-8">
+
+                <!-- AVATAR -->
+                <div class="w-24 h-24 bg-linear-to-br from-[#062B66] to-[#0a3d8f] rounded-2xl flex items-center justify-center text-5xl text-white font-bold">
+
+                    {user.name.charAt(0).toUpperCase()}
+
+                </div>
+
+                <!-- USER INFO -->
+                <div>
+
+                    <h2 class="text-3xl font-bold text-[#062B66] mb-2">
+                        {user.name}
+                    </h2>
+
+                    <p class="text-slate-600 text-lg mb-1">
+
+                        <span class="font-semibold">
+                            NIM:
+                        </span>
+
+                        {user.nim || '-'}
+
+                    </p>
+
+                    <p class="text-slate-600 text-lg">
+
+                        <span class="font-semibold">
+                            Email:
+                        </span>
+
+                        {user.email}
+
+                    </p>
+
+                </div>
+
             </div>
 
-            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-                <div class="text-4xl mb-4">📋</div>
-                <h3 class="text-lg font-bold text-[#062B66] mb-1">Cara Absensi</h3>
-                <ol class="text-slate-500 text-sm space-y-1 list-decimal list-inside">
-                    <li>Klik tombol "Scan QR Code"</li>
-                    <li>Izinkan akses kamera</li>
-                    <li>Arahkan kamera ke QR Code dosen</li>
-                    <li>Kehadiran otomatis tercatat</li>
-                </ol>
+        </div>
+
+        <!-- ACTION -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+
+            <!-- SCAN -->
+            <a
+                href="/presensi"
+                class="bg-white rounded-3xl shadow-sm p-8 border border-slate-200 hover:shadow-lg hover:border-[#062B66] transition cursor-pointer"
+            >
+
+                <div class="text-6xl mb-4">
+                    📱
+                </div>
+
+                <h3 class="text-2xl font-bold text-[#062B66] mb-2">
+                    Scan Presensi
+                </h3>
+
+                <p class="text-slate-500 text-lg leading-relaxed">
+                    Arahkan kamera ke QR Code untuk mencatat kehadiran Anda pada sesi yang aktif.
+                </p>
+
+                <div class="mt-6">
+
+                    <span class="bg-[#062B66] text-white px-5 py-2 rounded-xl inline-block font-semibold">
+
+                        Buka Scanner
+
+                    </span>
+
+                </div>
+
+            </a>
+
+            <!-- RIWAYAT -->
+            <a
+                href="/riwayat-absensi"
+                class="bg-white rounded-3xl shadow-sm p-8 border border-slate-200 hover:shadow-lg hover:border-[#062B66] transition cursor-pointer"
+            >
+
+                <div class="text-6xl mb-4">
+                    📋
+                </div>
+
+                <h3 class="text-2xl font-bold text-[#062B66] mb-2">
+                    Riwayat Absensi
+                </h3>
+
+                <p class="text-slate-500 text-lg leading-relaxed">
+                    Lihat riwayat lengkap kehadiran Anda di semua kelas dengan status dan waktu scan.
+                </p>
+
+                <div class="mt-6">
+
+                    <span class="bg-[#062B66] text-white px-5 py-2 rounded-xl inline-block font-semibold">
+
+                        Lihat Detail
+
+                    </span>
+
+                </div>
+
+            </a>
+
+        </div>
+
+        <!-- STATS -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+
+            <!-- HADIR -->
+            <div class="bg-green-50 border border-green-200 p-6 rounded-3xl shadow-sm">
+
+                <div class="text-4xl mb-3">
+                    ✅
+                </div>
+
+                <h3 class="text-3xl font-bold text-green-700 mb-1">
+                    {totalHadir}
+                </h3>
+
+                <p class="text-green-600 text-sm">
+                    Hadir
+                </p>
+
+            </div>
+
+            <!-- TELAT -->
+            <div class="bg-yellow-50 border border-yellow-200 p-6 rounded-3xl shadow-sm">
+
+                <div class="text-4xl mb-3">
+                    ⚠️
+                </div>
+
+                <h3 class="text-3xl font-bold text-yellow-700 mb-1">
+                    {totalTelat}
+                </h3>
+
+                <p class="text-yellow-600 text-sm">
+                    Telat
+                </p>
+
+            </div>
+
+            <!-- IZIN -->
+            <div class="bg-blue-50 border border-blue-200 p-6 rounded-3xl shadow-sm">
+
+                <div class="text-4xl mb-3">
+                    ℹ️
+                </div>
+
+                <h3 class="text-3xl font-bold text-blue-700 mb-1">
+                    {totalIzin}
+                </h3>
+
+                <p class="text-blue-600 text-sm">
+                    Izin
+                </p>
+
+            </div>
+
+            <!-- ALPHA -->
+            <div class="bg-red-50 border border-red-200 p-6 rounded-3xl shadow-sm">
+
+                <div class="text-4xl mb-3">
+                    ❌
+                </div>
+
+                <h3 class="text-3xl font-bold text-red-700 mb-1">
+                    {totalAlpha}
+                </h3>
+
+                <p class="text-red-600 text-sm">
+                    Alpha
+                </p>
+
             </div>
 
         </div>
@@ -272,3 +343,14 @@
     </main>
 
 </div>
+
+<style>
+
+    :global(body) {
+
+        margin: 0;
+        padding: 0;
+
+    }
+
+</style>
