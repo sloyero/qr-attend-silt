@@ -6,6 +6,9 @@ use App\Models\Kehadiran;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
+use App\Exports\KehadiranExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 class KehadiranController extends Controller
 {
     // Rekap kehadiran dosen/admin
@@ -32,5 +35,13 @@ class KehadiranController extends Controller
         return Inertia::render('Rekap/Riwayat', [
             'riwayat' => $riwayat
         ]);
+    }
+
+    public function export()
+    {
+        return Excel::download(
+            new KehadiranExport(),
+            'rekap-kehadiran.xlsx'
+        );
     }
 }

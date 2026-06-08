@@ -193,6 +193,10 @@ Route::get('/rekap', [KehadiranController::class, 'index'])
 Route::get('/riwayat-absensi', [KehadiranController::class, 'riwayat'])
     ->middleware('auth');
 
+// Download Riwayat Kehadiran
+Route::get('/kehadiran/export', [KehadiranController::class, 'export'])
+    ->middleware('auth');
+
 
 
 /*

@@ -15,9 +15,18 @@
         </a>
 
 
-        <h1 class="text-5xl font-bold text-[#062B66] mb-3">
-            Rekap Kehadiran
-        </h1>
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-6xl font-bold text-[#062B66]">
+                Rekap Kehadiran
+            </h1>
+
+            <a
+                href="/kehadiran/export"
+                class="bg-green-600 text-white px-5 py-3 rounded-xl font-semibold hover:bg-green-700"
+            >
+                📥 Download Excel
+            </a>
+        </div>
 
         <p class="text-slate-500 text-lg">
             Data kehadiran seluruh mahasiswa.
