@@ -56,8 +56,6 @@ class SesiPresensiController extends Controller
 
     public function store(Request $request)
     {
-        // 👇👇👇 TUGAS SAYYID: GENERATE QR CODE (BACKEND) 👇👇👇
-        // Bagian ini bertanggung jawab membuat token UUID yang akan diubah menjadi QR Code di frontend.
         $request->validate([
             'mata_kuliah_id' => 'required|exists:mata_kuliahs,id',
             'durasi_menit' => 'required|integer|min:1|max:15',
@@ -138,8 +136,6 @@ class SesiPresensiController extends Controller
 
     public function scan(Request $request)
     {
-        // 👇👇👇 TUGAS SAYYID: SCAN QR CODE (BACKEND) 👇👇👇
-        // Bagian ini menerima token UUID dari hasil scan kamera mahasiswa dan memvalidasi kehadirannya.
         $request->validate([
             'token' => 'required|string',
         ]);

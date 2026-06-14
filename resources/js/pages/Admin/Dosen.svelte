@@ -11,6 +11,7 @@
     let password = ''
     let loading = false
 
+    // State for inline edit
     let editingId = null
     let editingMatkulVal = ''
 
@@ -30,8 +31,12 @@
                 body: JSON.stringify({ name, nidn, matkul, email, password }),
             })
             if (response.ok) {
-                toast.success(`Dosen ${name} berhasil ditambahkan!`)
-                name = ''; nidn = ''; matkul = ''; email = ''; password = ''
+                toast.success(`Dosen ${name} berhasil ditambahkan! 🎓`)
+                name = ''
+                nidn = ''
+                matkul = ''
+                email = ''
+                password = ''
                 router.reload({ only: ['dosen'] })
             } else {
                 const data = await response.json().catch(() => ({}))
@@ -73,7 +78,7 @@
                 body: JSON.stringify({ matkul: editingMatkulVal }),
             })
             if (response.ok) {
-                toast.success('Mata kuliah berhasil diperbarui!')
+                toast.success('Mata kuliah berhasil diperbarui! 📚')
                 editingId = null
                 router.reload({ only: ['dosen'] })
             } else {
@@ -84,157 +89,153 @@
         }
     }
 
-    function startEdit(d) { editingId = d.id; editingMatkulVal = d.matkul || '' }
-    function cancelEdit() { editingId = null }
+    function startEdit(d) {
+        editingId = d.id
+        editingMatkulVal = d.matkul || ''
+    }
+
+    function cancelEdit() {
+        editingId = null
+    }
 </script>
 
-<div class="min-h-screen bg-[var(--color-bg)] text-[var(--color-text-primary)] flex flex-col font-[var(--font-sans)]">
+<div class="admin-page">
 
     <!-- TOP BAR -->
-    <header class="bg-white/80 backdrop-blur-md border-b border-[var(--color-border)] sticky top-0 z-10 px-6 lg:px-8 py-4">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+    <header class="admin-topbar animate-fade-in">
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
             <div>
-                <p class="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-widest mb-0.5 flex items-center gap-1.5">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    Admin Portal
-                </p>
-                <h1 class="text-xl lg:text-2xl font-bold text-[var(--color-text-primary)]">Kelola Data Dosen</h1>
+                <div class="admin-label"><span>🛡️</span> Admin Portal</div>
+                <h1 class="qr-page-title">Kelola Data Dosen</h1>
             </div>
-            <a href="/admin/dashboard" class="flex items-center gap-2 bg-white hover:bg-slate-50 text-[var(--color-text-secondary)] font-medium px-4 py-2.5 rounded-xl transition shadow-sm border border-[var(--color-border)] hover:border-slate-300 text-sm">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                Dashboard
-            </a>
+            <a href="/admin/dashboard" class="qr-btn qr-btn-outline qr-btn-sm">← Dashboard Admin</a>
         </div>
     </header>
 
     <!-- MAIN -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <main class="admin-body">
 
-        <!-- FORM -->
-        <section class="lg:col-span-1 animate-slide-in-left">
-            <div class="bg-white border border-[var(--color-border)] rounded-2xl p-6 shadow-[var(--shadow-sm)] sticky top-24">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-                    </div>
+        <!-- FORM COLUMN -->
+        <section class="form-col">
+            <div class="qr-card animate-slide-up" style="padding: 24px; position: sticky; top: 96px;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                    <div class="form-icon" style="background: var(--color-primary-light);">➕</div>
                     <div>
-                        <h2 class="text-lg font-bold text-[var(--color-text-primary)]">Tambah Dosen</h2>
-                        <p class="text-xs text-[var(--color-text-muted)]">Masukkan detail akun dosen baru</p>
+                        <h2 style="font-size: 18px; font-weight: 700; color: var(--color-primary); margin: 0;">Tambah Dosen</h2>
+                        <p style="font-size: 12px; color: var(--color-text-muted); margin: 2px 0 0 0;">Masukkan detail untuk akun dosen baru</p>
                     </div>
                 </div>
 
-                <div class="space-y-4">
+                <div style="display: flex; flex-direction: column; gap: 16px;">
                     <div>
-                        <label for="dosen-name" class="block text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-1.5">Nama Lengkap</label>
-                        <input id="dosen-name" bind:value={name} type="text" placeholder="Dr. Budi Santoso" class="w-full bg-[var(--color-bg)] border border-[var(--color-border)] focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 rounded-xl px-4 py-3 text-sm placeholder-[var(--color-text-muted)] outline-none transition" />
+                        <label for="name" class="qr-label">Nama Lengkap</label>
+                        <input id="name" bind:value={name} type="text" placeholder="Contoh: Dr. Budi Santoso" class="qr-input" />
                     </div>
                     <div>
-                        <label for="dosen-nidn" class="block text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-1.5">NIDN</label>
-                        <input id="dosen-nidn" bind:value={nidn} type="text" placeholder="0412088501" class="w-full bg-[var(--color-bg)] border border-[var(--color-border)] focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 rounded-xl px-4 py-3 text-sm placeholder-[var(--color-text-muted)] outline-none transition" />
+                        <label for="nidn" class="qr-label">NIDN</label>
+                        <input id="nidn" bind:value={nidn} type="text" placeholder="Contoh: 0412088501" class="qr-input" />
                     </div>
                     <div>
-                        <label for="dosen-matkul" class="block text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-1.5">Mata Kuliah</label>
-                        <textarea id="dosen-matkul" bind:value={matkul} placeholder="Pemrograman Web, Basis Data, AI" class="w-full bg-[var(--color-bg)] border border-[var(--color-border)] focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 rounded-xl px-4 py-3 text-sm placeholder-[var(--color-text-muted)] outline-none transition h-20 resize-none"></textarea>
+                        <label for="matkul" class="qr-label">Mata Kuliah</label>
+                        <textarea id="matkul" bind:value={matkul} placeholder="Masukkan mata kuliah dipisahkan koma. Contoh: Pemrograman Web, Basis Data" class="qr-input" style="height: 88px; resize: none;"></textarea>
                     </div>
                     <div>
-                        <label for="dosen-email" class="block text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-1.5">Email</label>
-                        <input id="dosen-email" bind:value={email} type="email" placeholder="dosen@universitas.ac.id" class="w-full bg-[var(--color-bg)] border border-[var(--color-border)] focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 rounded-xl px-4 py-3 text-sm placeholder-[var(--color-text-muted)] outline-none transition" />
+                        <label for="email" class="qr-label">Alamat Email</label>
+                        <input id="email" bind:value={email} type="email" placeholder="dosen@universitas.ac.id" class="qr-input" />
                     </div>
                     <div>
-                        <label for="dosen-password" class="block text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-1.5">Password</label>
-                        <input id="dosen-password" bind:value={password} type="password" placeholder="••••••••" class="w-full bg-[var(--color-bg)] border border-[var(--color-border)] focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 rounded-xl px-4 py-3 text-sm placeholder-[var(--color-text-muted)] outline-none transition" />
+                        <label for="password" class="qr-label">Password Akun</label>
+                        <input id="password" bind:value={password} type="password" placeholder="••••••••" class="qr-input" />
                     </div>
-                    <button on:click={tambahDosen} disabled={loading} class="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] active:bg-[var(--color-primary-active)] text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-sm hover:shadow-md mt-2 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 border-0 text-sm">
+
+                    <button on:click={tambahDosen} disabled={loading} class="qr-btn qr-btn-primary" style="width: 100%; margin-top: 8px;">
                         {#if loading}
-                            <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            Menyimpan...
+                            ⏳ Menyimpan...
                         {:else}
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-                            Daftarkan Dosen
+                            🎓 Daftarkan Dosen
                         {/if}
                     </button>
                 </div>
             </div>
         </section>
 
-        <!-- TABLE -->
-        <section class="lg:col-span-2 animate-slide-up">
-            <div class="bg-white border border-[var(--color-border)] rounded-2xl p-6 shadow-[var(--shadow-sm)]">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-3">
+        <!-- TABLE COLUMN -->
+        <section class="table-col">
+            <div class="qr-card animate-slide-up" style="padding: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 8px;">
                     <div>
-                        <h2 class="text-lg font-bold text-[var(--color-text-primary)]">Daftar Dosen Aktif</h2>
-                        <p class="text-xs text-[var(--color-text-muted)]">Total {dosen.length} dosen terdaftar</p>
+                        <h2 style="font-size: 18px; font-weight: 700; color: var(--color-primary); margin: 0;">Daftar Dosen Aktif</h2>
+                        <p style="font-size: 12px; color: var(--color-text-muted); margin: 2px 0 0 0;">Total {dosen.length} dosen terdaftar di sistem</p>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto rounded-xl border border-[var(--color-border)]">
-                    <table class="w-full">
+                <div style="overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                    <table class="qr-table">
                         <thead>
-                            <tr class="bg-[var(--color-bg)] border-b border-[var(--color-border)]">
-                                <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Info Dosen</th>
-                                <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Mata Kuliah</th>
-                                <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider w-28">Aksi</th>
+                            <tr>
+                                <th>Info Dosen</th>
+                                <th>Mata Kuliah</th>
+                                <th style="width: 100px;">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-[var(--color-border-light)]">
+                        <tbody>
                             {#if dosen.length === 0}
                                 <tr>
-                                    <td colspan="3" class="text-center py-12">
-                                        <svg class="w-12 h-12 mx-auto mb-3 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                        <p class="text-sm text-[var(--color-text-muted)]">Belum ada data dosen terdaftar.</p>
+                                    <td colspan="3">
+                                        <div class="qr-empty">
+                                            <div class="qr-empty-icon">👨‍🏫</div>
+                                            <div class="qr-empty-text">Belum ada data dosen terdaftar.</div>
+                                        </div>
                                     </td>
                                 </tr>
                             {:else}
                                 {#each dosen as d}
-                                    <tr class="hover:bg-slate-50/50 transition">
-                                        <td class="py-3.5 px-4">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-muted)] text-white flex items-center justify-center font-bold text-xs shrink-0">
-                                                    {d.name.charAt(0).toUpperCase()}
-                                                </div>
-                                                <div class="min-w-0">
-                                                    <div class="font-semibold text-sm text-[var(--color-text-primary)] truncate">{d.name}</div>
-                                                    <div class="text-xs text-[var(--color-text-muted)] flex items-center gap-1.5 mt-0.5">
-                                                        <span>ID: {d.nidn || '-'}</span>
-                                                        <span class="text-slate-300">•</span>
-                                                        <span class="truncate">{d.email}</span>
+                                    <tr>
+                                        <!-- INFO -->
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 12px;">
+                                                <div class="table-avatar">{d.name.charAt(0).toUpperCase()}</div>
+                                                <div>
+                                                    <div style="font-weight: 700; color: var(--color-text);">{d.name}</div>
+                                                    <div style="font-size: 12px; color: var(--color-text-muted); margin-top: 2px;">
+                                                        ID: {d.nidn || '-'} <span style="color: var(--color-border);">•</span> {d.email}
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="py-3.5 px-4">
+
+                                        <!-- MATA KULIAH / INLINE EDIT -->
+                                        <td>
                                             {#if editingId === d.id}
-                                                <div class="flex items-center gap-2 max-w-sm">
-                                                    <input bind:value={editingMatkulVal} class="bg-white border border-[var(--color-border)] focus:border-[var(--color-accent)] rounded-lg px-2.5 py-1.5 text-xs outline-none w-full transition" placeholder="Pisahkan dengan koma" />
-                                                    <button on:click={() => editMatkul(d.id)} class="bg-[var(--color-success)] hover:bg-emerald-700 text-white p-2 rounded-lg text-xs cursor-pointer border-0" title="Simpan">
-                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
-                                                    </button>
-                                                    <button on:click={cancelEdit} class="bg-slate-100 hover:bg-slate-200 text-[var(--color-text-secondary)] p-2 rounded-lg text-xs cursor-pointer border-0" title="Batal">
-                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>
-                                                    </button>
+                                                <div style="display: flex; align-items: center; gap: 8px; max-width: 280px;">
+                                                    <input bind:value={editingMatkulVal} class="qr-input" style="padding: 8px 12px; font-size: 13px;" placeholder="Pisahkan dengan koma" />
+                                                    <button on:click={() => editMatkul(d.id)} class="qr-btn qr-btn-sm" style="background: var(--color-success); color: white; padding: 8px 12px;" title="Simpan">✓</button>
+                                                    <button on:click={cancelEdit} class="qr-btn qr-btn-ghost qr-btn-sm" title="Batal">✕</button>
                                                 </div>
                                             {:else}
-                                                <div class="flex items-center gap-2 group">
-                                                    <div class="flex flex-wrap gap-1">
+                                                <div class="matkul-cell">
+                                                    <div style="display: flex; flex-wrap: wrap; gap: 4px;">
                                                         {#if d.matkul}
                                                             {#each d.matkul.split(',') as subject}
-                                                                <span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[10px] font-semibold border border-blue-100/50">{subject.trim()}</span>
+                                                                <span class="qr-badge qr-badge-info" style="font-size: 11px; padding: 2px 8px;">
+                                                                    {subject.trim()}
+                                                                </span>
                                                             {/each}
                                                         {:else}
-                                                            <span class="text-xs text-[var(--color-text-muted)] italic">Belum ada</span>
+                                                            <span style="font-size: 13px; color: var(--color-text-muted); font-style: italic;">Belum ada matkul</span>
                                                         {/if}
                                                     </div>
-                                                    <button on:click={() => startEdit(d)} class="opacity-0 group-hover:opacity-100 text-xs text-blue-600 hover:text-blue-700 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-lg transition cursor-pointer border-0 ml-auto flex items-center gap-1 shrink-0">
-                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                                        Edit
+                                                    <button on:click={() => startEdit(d)} class="edit-btn qr-btn qr-btn-ghost qr-btn-sm" style="font-size: 12px;">
+                                                        ✏️ Edit
                                                     </button>
                                                 </div>
                                             {/if}
                                         </td>
-                                        <td class="py-3.5 px-4">
-                                            <button on:click={() => hapusDosen(d.id, d.name)} class="flex items-center gap-1.5 text-[var(--color-error)] hover:bg-[var(--color-error-light)] px-3 py-2 rounded-lg transition text-xs font-semibold cursor-pointer border-0 bg-transparent">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-                                                Hapus
+
+                                        <!-- ACTIONS -->
+                                        <td>
+                                            <button on:click={() => hapusDosen(d.id, d.name)} class="qr-btn qr-btn-ghost qr-btn-sm" style="color: var(--color-danger);">
+                                                🗑️ Hapus
                                             </button>
                                         </td>
                                     </tr>
@@ -245,5 +246,96 @@
                 </div>
             </div>
         </section>
+
     </main>
+
 </div>
+
+<style>
+    .admin-page {
+        min-height: 100vh;
+        background: var(--color-bg);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .admin-topbar {
+        background: rgba(255,255,255,0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--color-border);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        padding: 20px 24px;
+    }
+
+    .admin-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--color-accent);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 4px;
+    }
+
+    .admin-body {
+        flex: 1;
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 32px 24px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 24px;
+        align-items: start;
+    }
+
+    .form-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .table-avatar {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        border-radius: 50%;
+        background: var(--color-primary-light);
+        color: var(--color-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .matkul-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .edit-btn {
+        opacity: 0;
+        transition: opacity var(--transition-fast);
+    }
+
+    tr:hover .edit-btn {
+        opacity: 1;
+    }
+
+    @media (min-width: 1024px) {
+        .admin-body {
+            grid-template-columns: 1fr 2fr;
+            padding: 40px 32px;
+        }
+    }
+</style>

@@ -144,7 +144,7 @@
                 href="/mahasiswa/dashboard"
                 class="flex items-center gap-3 text-slate-600 hover:bg-slate-100 px-5 py-4 rounded-xl"
             >
-                📊 Dashboard
+                 Dashboard
             </a>
 
             <!-- SCAN -->
@@ -152,7 +152,7 @@
                 href="/presensi"
                 class="flex items-center gap-3 text-slate-600 hover:bg-slate-100 px-5 py-4 rounded-xl"
             >
-                🎯 Scan Presensi
+                 Scan Presensi
             </a>
 
             <!-- RIWAYAT -->
@@ -160,7 +160,7 @@
                 href="/riwayat-absensi"
                 class="flex items-center gap-3 text-slate-600 hover:bg-slate-100 px-5 py-4 rounded-xl"
             >
-                📄 Riwayat Absensi
+                 Riwayat Absensi
             </a>
 
             <!-- PROFILE -->
@@ -168,7 +168,7 @@
                 href="/akun"
                 class="flex items-center gap-3 bg-slate-100 text-[#062B66] px-5 py-4 rounded-xl font-semibold"
             >
-                ⚙️ Profile
+                 Profile
             </a>
 
         </nav>
@@ -177,7 +177,7 @@
             onclick={logout}
             class="w-full bg-red-50 text-red-600 hover:bg-red-100 px-5 py-3 rounded-xl font-semibold transition border border-red-200"
         >
-            🚪 Logout
+             Logout
         </button>
 
     </aside>

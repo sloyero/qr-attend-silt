@@ -2,96 +2,72 @@
     export let riwayat = [];
 </script>
 
-<div class="min-h-screen bg-slate-100 p-10">
+<div class="page-wrap">
 
     <!-- HEADER -->
-    <div class="mb-10">
-        <a
-            href="/mahasiswa/dashboard"
-            class="inline-flex items-center gap-2 bg-[#062B66] text-white px-5 py-3 rounded-2xl mb-6 hover:bg-blue-900 transition"
-        >
+    <div class="animate-fade-in" style="margin-bottom: 32px;">
+
+        <a href="/mahasiswa/dashboard" class="qr-btn qr-btn-outline qr-btn-sm" style="margin-bottom: 20px; display: inline-flex;">
             ← Kembali ke Dashboard
         </a>
 
-
-        <h1 class="text-5xl font-bold text-[#062B66] mb-3">
-            Riwayat Absensi
-        </h1>
-
-        <p class="text-slate-500 text-lg">
-            Riwayat kehadiran Anda.
-        </p>
+        <h1 class="qr-page-title">Riwayat Absensi</h1>
+        <p class="qr-page-subtitle">Riwayat kehadiran Anda.</p>
     </div>
 
     <!-- TABLE -->
-    <div class="bg-white rounded-3xl shadow-sm overflow-hidden border border-slate-200">
-
-        <table class="w-full">
-
-            <thead class="bg-slate-100 text-slate-700">
-                <tr>
-                    <th class="p-5 text-left">No</th>
-                    <th class="p-5 text-left">Mata Kuliah</th>
-                    <th class="p-5 text-left">Waktu Scan</th>
-                    <th class="p-5 text-left">Status</th>
-                </tr>
-            </thead>
-
-            <tbody>
-
-                {#if riwayat.length > 0}
-
-                    {#each riwayat as item, index}
-
-                        <tr class="border-t border-slate-200 hover:bg-slate-50">
-
-                            <td class="p-5">
-                                {index + 1}
-                            </td>
-
-                            <td class="p-5 font-semibold text-slate-700">
-                                {item.mata_kuliah?.nama_matkul}
-                            </td>
-
-                            <td class="p-5 text-slate-500">
-                                {item.waktu_scan}
-                            </td>
-
-                            <td class="p-5">
-
-                                <span
-                                    class="px-4 py-2 rounded-xl text-sm font-semibold
-                                    {item.status === 'hadir'
-                                        ? 'bg-green-100 text-green-700'
-                                        : item.status === 'telat'
-                                        ? 'bg-yellow-100 text-yellow-700'
-                                        : item.status === 'izin'
-                                        ? 'bg-blue-100 text-blue-700'
-                                        : 'bg-red-100 text-red-700'}"
-                                >
-                                    {item.status}
-                                </span>
-
-                            </td>
-
-                        </tr>
-
-                    {/each}
-
-                {:else}
-
+    <div class="qr-card animate-slide-up" style="overflow: hidden;">
+        <div style="overflow-x: auto;">
+            <table class="qr-table">
+                <thead>
                     <tr>
-                        <td colspan="4" class="p-10 text-center text-slate-500">
-                            Belum ada riwayat absensi.
-                        </td>
+                        <th>No</th>
+                        <th>Mata Kuliah</th>
+                        <th>Waktu Scan</th>
+                        <th>Status</th>
                     </tr>
-
-                {/if}
-
-            </tbody>
-
-        </table>
-
+                </thead>
+                <tbody>
+                    {#if riwayat.length > 0}
+                        {#each riwayat as item, index}
+                            <tr>
+                                <td>{index + 1}</td>
+                                <td style="font-weight: 600;">{item.mata_kuliah?.nama_matkul}</td>
+                                <td style="color: var(--color-text-secondary);">{item.waktu_scan}</td>
+                                <td>
+                                    <span class="qr-badge {item.status === 'hadir' ? 'qr-badge-success' : item.status === 'telat' ? 'qr-badge-warning' : item.status === 'izin' ? 'qr-badge-info' : 'qr-badge-danger'}">
+                                        {item.status}
+                                    </span>
+                                </td>
+                            </tr>
+                        {/each}
+                    {:else}
+                        <tr>
+                            <td colspan="4">
+                                <div class="qr-empty">
+                                    <div class="qr-empty-icon">📄</div>
+                                    <div class="qr-empty-text">Belum ada riwayat absensi.</div>
+                                </div>
+                            </td>
+                        </tr>
+                    {/if}
+                </tbody>
+            </table>
+        </div>
     </div>
 
 </div>
+
+<style>
+    .page-wrap {
+        min-height: 100vh;
+        background: var(--color-bg);
+        padding: 32px 24px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    @media (min-width: 768px) {
+        .page-wrap { padding: 48px 40px; }
+    }
+</style>
