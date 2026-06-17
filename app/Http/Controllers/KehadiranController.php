@@ -95,14 +95,16 @@ class KehadiranController extends Controller
     {
         $sesi = SesiPresensi::with('mataKuliah')->findOrFail($id);
 
-        // Ambil semua mahasiswa
-        $mahasiswas = User::where('role', 'mahasiswa')->get();
+        // Ambil semua mahasiswa beserta data kehadirannya untuk sesi ini
+        $mahasiswas = User::where('role', 'mahasiswa')
+            ->with(['kehadirans' => function ($query) use ($id) {
+                $query->where('sesi_presensi_id', $id);
+            }])
+            ->get();
 
-        $data = $mahasiswas->map(function ($mhs) use ($id) {
+        $data = $mahasiswas->map(function ($mhs) {
 
-            $kehadiran = Kehadiran::where('sesi_presensi_id', $id)
-                ->where('user_id', $mhs->id)
-                ->first();
+            $kehadiran = $mhs->kehadirans->first();
 
             return [
                 'id' => $mhs->id,

@@ -22,10 +22,8 @@ class SesiPresensiController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->role === 'mahasiswa') {
-            return Inertia::render('Admin/Dashboard', [
-                'user' => $user,
-            ]);
+        if ($user->role !== 'dosen') {
+            abort(403, 'Unauthorized access.');
         }
 
         $mataKuliahs = MataKuliah::where('dosen_id', $user->id)->get();
@@ -174,8 +172,8 @@ class SesiPresensiController extends Controller
             ], 409);
         }
 
-        // Tentukan status: telat jika melewati threshold dinamis (sama dengan durasi sesi)
-        $threshold = $sesi->durasi_menit;
+        // Tentukan status: telat jika melewati 1/3 durasi sesi
+        $threshold = max(1, floor($sesi->durasi_menit / 3));
         $minutesSinceStart = now()->diffInMinutes($sesi->started_at);
         $status = $minutesSinceStart >= $threshold ? 'telat' : 'hadir';
 

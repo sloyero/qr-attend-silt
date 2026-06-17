@@ -40,7 +40,7 @@ Route::get('/admin/dashboard', function () {
 
     ]);
 
-})->middleware('auth');
+})->middleware(['auth', 'role:admin']);
 
 Route::get('/dosen/dashboard', function () {
     $user = auth()->user();
@@ -81,7 +81,7 @@ Route::get('/dosen/dashboard', function () {
         'totalSesi' => $totalSesi,
         'kehadiranRate' => $kehadiranRate,
     ]);
-})->middleware('auth');
+})->middleware(['auth', 'role:dosen']);
 
 Route::get('/mahasiswa/dashboard', function () {
 
@@ -91,7 +91,7 @@ Route::get('/mahasiswa/dashboard', function () {
 
     ]);
 
-})->middleware('auth');
+})->middleware(['auth', 'role:mahasiswa']);
 
 
 
@@ -149,11 +149,11 @@ Route::post('/akun/photo', [AuthController::class, 'uploadPhoto']);
 |--------------------------------------------------------------------------
 */
 
-Route::get('/mahasiswa', [MahasiswaController::class, 'index']);
-
-Route::post('/mahasiswa', [MahasiswaController::class, 'store']);
-
-Route::delete('/mahasiswa/{id}', [MahasiswaController::class, 'destroy']);
+Route::middleware(['auth', 'role:dosen'])->group(function () {
+    Route::get('/mahasiswa', [MahasiswaController::class, 'index']);
+    Route::post('/mahasiswa', [MahasiswaController::class, 'store']);
+    Route::delete('/mahasiswa/{id}', [MahasiswaController::class, 'destroy']);
+});
 
 
 
@@ -163,21 +163,20 @@ Route::delete('/mahasiswa/{id}', [MahasiswaController::class, 'destroy']);
 |--------------------------------------------------------------------------
 */
 
-Route::get('/admin/mahasiswa', function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/mahasiswa', function () {
+        return Inertia::render('AdminMahasiswa', [
+            'mahasiswa' => \App\Models\User::where('role', 'mahasiswa')->get(),
+        ]);
+    });
 
-    return Inertia::render('AdminMahasiswa', [
-
-        'mahasiswa' => \App\Models\User::where('role', 'mahasiswa')->get(),
-
-    ]);
-
+    Route::get('/admin/dosen', [AdminController::class, 'dosen']);
+    Route::post('/admin/dosen', [AdminController::class, 'storeDosen']);
+    Route::post('/admin/mahasiswa', [AdminController::class, 'storeMahasiswa']);
+    Route::delete('/admin/dosen/{id}', [AdminController::class, 'destroyDosen']);
+    Route::put('/admin/dosen/{id}/matkul', [AdminController::class, 'updateMatkul']);
+    Route::delete('/admin/mahasiswa/{id}', [AdminController::class, 'destroyMahasiswa']);
 });
-
-Route::get('/admin/dosen', [AdminController::class, 'dosen']);
-
-Route::post('/admin/dosen', [AdminController::class, 'storeDosen']);
-
-Route::post('/admin/mahasiswa', [AdminController::class, 'storeMahasiswa']);
 
 /*
 |--------------------------------------------------------------------------
@@ -251,7 +250,4 @@ Route::get('/presensi/{id}/status', [SesiPresensiController::class, 'status'])
 Route::post('/absensi/scan', [SesiPresensiController::class, 'scan'])
     ->middleware('auth');
 
-    Route::delete('/admin/dosen/{id}', [AdminController::class, 'destroyDosen']);
-    Route::put('/admin/dosen/{id}/matkul', [AdminController::class, 'updateMatkul']);
-    Route::delete('/admin/mahasiswa/{id}', [AdminController::class, 'destroyMahasiswa']);
-    
+    // End of file

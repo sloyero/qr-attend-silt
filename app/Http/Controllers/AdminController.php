@@ -33,6 +33,13 @@ class AdminController extends Controller
 
     public function storeDosen(Request $request)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'nidn' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
+        ]);
+
         $dosen = User::create([
             'name' => $request->name,
             'nidn' => $request->nidn,
@@ -66,6 +73,13 @@ class AdminController extends Controller
 
     public function storeMahasiswa(Request $request)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'nim' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
+        ]);
+
         User::create([
 
             'name' => $request->name,
@@ -110,6 +124,10 @@ class AdminController extends Controller
 
     public function updateMatkul(Request $request, $id)
     {
+        $request->validate([
+            'matkul' => 'nullable|string',
+        ]);
+
         $dosen = User::findOrFail($id);
 
         $dosen->update([
