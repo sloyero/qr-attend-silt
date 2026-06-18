@@ -22,6 +22,12 @@ class SesiPresensiController extends Controller
     {
         $user = Auth::user();
 
+        if ($user->role === 'mahasiswa') {
+            return Inertia::render('Admin/Dashboard', [
+                'user' => $user,
+            ]);
+        }
+
         if ($user->role !== 'dosen') {
             abort(403, 'Unauthorized access.');
         }
