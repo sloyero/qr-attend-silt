@@ -36,6 +36,14 @@ if (!file_exists($manifestDst)) {
 $uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 $publicPath = __DIR__ . '/../public' . $uri;
 
+// [Vercel] Serve uploaded profile pictures from writable /tmp
+if (strpos($uri, '/profile/') === 0) {
+    $tmpProfilePath = '/tmp/public' . $uri;
+    if (file_exists($tmpProfilePath) && !is_dir($tmpProfilePath)) {
+        $publicPath = $tmpProfilePath;
+    }
+}
+
 if ($uri !== '/' && file_exists($publicPath) && !is_dir($publicPath)) {
     $mimeTypes = [
         'css'  => 'text/css',

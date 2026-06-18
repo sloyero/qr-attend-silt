@@ -167,23 +167,26 @@ class AuthController extends Controller
     public function uploadPhoto(Request $request)
     {
         $request->validate([
-
             'photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-
         ]);
 
         $file = $request->file('photo');
-
         $filename = time() . '.' . $file->getClientOriginalExtension();
 
-        $file->move(public_path('profile'), $filename);
+        $targetDir = public_path('profile');
+        if (!is_writable($targetDir) || !is_writable(dirname($targetDir))) {
+            $targetDir = '/tmp/public/profile';
+        }
+
+        if (!file_exists($targetDir)) {
+            @mkdir($targetDir, 0777, true);
+        }
+
+        $file->move($targetDir, $filename);
 
         $user = Auth::user();
-
         $user->update([
-
             'photo' => $filename,
-
         ]);
 
         return back();

@@ -79,6 +79,13 @@
                     <h2 style="font-weight: 700; color: var(--color-text); font-size: 15px; margin: 0;">{user.name}</h2>
                     <p style="color: var(--color-text-muted); font-size: 13px; margin: 2px 0 0 0;">{user.nim}</p>
                 </div>
+                {#if user && user.photo}
+                    <img src="/profile/{user.photo}" alt={user.name} style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: var(--shadow-sm);" />
+                {:else}
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #062B66, #0a3d8f); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 16px; border: 2px solid white; box-shadow: var(--shadow-sm);">
+                        {user && user.name ? user.name.charAt(0).toUpperCase() : '?'}
+                    </div>
+                {/if}
             </div>
         </div>
 
